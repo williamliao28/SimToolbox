@@ -4,12 +4,12 @@
 #include <vector>
 
 int main(int argc, char **argv) {
-    //int threadnum;
+    int threadnum;
     
     #pragma omp parallel
     {
         int rank = omp_get_thread_num();
-        int threadnum = omp_get_num_threads();
+        threadnum = omp_get_num_threads();
         if (rank == 0)
         {
             printf("Number of threads: %d\n",threadnum);
@@ -22,7 +22,7 @@ int main(int argc, char **argv) {
 
         const int globalSize = argc > 1 ? atoi(argv[1]) : 500;
         const double diagonal = argc > 2 ? atof(argv[2]) : 0.0;
-        CPSolver lcptest(globalSize, diagonal);
+        CPSolver lcptest(globalSize, threadnum, diagonal);
 
         double tol = 1e-5;
 
