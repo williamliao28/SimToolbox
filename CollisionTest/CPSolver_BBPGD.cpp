@@ -510,3 +510,500 @@ int CPSolver::LCP_BBPGD(Teuchos::RCP<TV> &xsolRcp, const double tol, const int i
 
     return 0;
 }
+
+
+int CPSolver::LCP_APGD(Teuchos::RCP<TV> &xsolRcp, const double tol, const int iteMax, IteHistory &history) const {
+    MPI_Barrier(MPI_COMM_WORLD);
+    int mvCount = 0;
+    if (commRcp->getRank() == 0) {
+        std::cout << "solving APGD" << std::endl;
+        std::cout << "ARcp" << ARcp->description() << std::endl;
+    }
+    // map must match
+    TEUCHOS_TEST_FOR_EXCEPTION(!this->mapRcp->isSameAs(*(xsolRcp->getMap())), std::invalid_argument,
+                               "xsolrcp and A operator do not have the same Map.");
+
+    // allocate vectors
+    Teuchos::RCP<TV> xkRcp = Teuchos::rcp(new TV(*xsolRcp, Teuchos::Copy)); // deep copy
+    Teuchos::RCP<TV> ykRcp = Teuchos::rcp(new TV(*xsolRcp, Teuchos::Copy)); // deep copy, yk=xk
+
+    Teuchos::RCP<TV> xkp1Rcp = Teuchos::rcp(new TV(this->mapRcp.getConst(), true));
+    Teuchos::RCP<TV> ykp1Rcp = Teuchos::rcp(new TV(this->mapRcp.getConst(), true));
+
+    Teuchos::RCP<TV> gVecRcp = Teuchos::rcp(new TV(this->mapRcp.getConst(), true));
+
+    Teuchos::RCP<TV> tempVecRcp = Teuchos::rcp(new TV(this->mapRcp.getConst(), true)); // temporary result holder
+
+    Teuchos::RCP<TV> xhatkRcp = Teuchos::rcp(new TV(this->mapRcp.getConst(), true));
+    xhatkRcp->putScalar(1.0);
+    // if (commRcp()->getRank() == 0)
+    //     std::cout << "initial vector allocated" << std::endl;
+
+    double thetak = 1;
+    double thetakp1 = 1;
+
+    Teuchos::RCP<TV> xkdiffRcp = Teuchos::rcp(new TV(this->mapRcp.getConst(), true));
+    xkdiffRcp->update(-1.0, *xhatkRcp, 1.0, *xkRcp, 0.0);
+
+    ARcp->apply(*xkdiffRcp, *tempVecRcp);
+    mvCount++;
+
+    const double tempNorm2 = tempVecRcp->norm2();
+    const double xkdiffNorm2 = xkdiffRcp->norm2();
+    double Lk = (tempNorm2 / xkdiffNorm2);
+    double tk = 1.0 / Lk;
+
+    Teuchos::RCP<TV> AxbRcp = Teuchos::rcp(new TV(this->mapRcp.getConst(), false));
+    Teuchos::RCP<TV> Axbkp1Rcp = Teuchos::rcp(new TV(this->mapRcp.getConst(), true));
+
+    history.push_back(std::array<double, 6>{{0, 0, 0, tk, 0, 1.0 * mvCount}});
+
+    // enter main loop
+    int iteCount = 0;
+    double resmin = std::numeric_limits<double>::max();
+
+    while (iteCount < iteMax) {
+        iteCount++;
+
+        // line 7 of Mazhar, 2015, g=A.dot(yk)+b
+        ARcp->apply(*ykRcp, *AxbRcp); // Axb = A yk, this does not change in the following Lifshitz loop
+        mvCount++;
+        gVecRcp->update(1.0, *bRcp, 1.0, *AxbRcp, 0.0);
+        // line 8 of Mazhar, 2015
+        xkp1Rcp->update(1.0, *ykRcp, -tk, *gVecRcp, 0);
+        clipZero(xkp1Rcp);
+
+        double rightTerm1 = ykRcp->dot(*AxbRcp) * 0.5; // yk.dot(A.dot(yk))*0.5
+        double rightTerm2 = ykRcp->dot(*bRcp);         // yk.dot(b)
+
+        while (1) {
+            //  xkdiff=xkp1-yk
+            xkdiffRcp->update(1.0, *xkp1Rcp, -1.0, *ykRcp, 0.0);
+
+            //  calc Lifshitz condition
+            ARcp->apply(*xkp1Rcp, *Axbkp1Rcp);
+            mvCount++;
+            double leftTerm1 = xkp1Rcp->dot(*Axbkp1Rcp) * 0.5; // xkp1.dot(A.dot(xkp1))*0.5
+            double leftTerm2 = xkp1Rcp->dot(*bRcp);            // xkp1.dot(b)
+
+            double rightTerm3 = gVecRcp->dot(*xkdiffRcp);              // g.dot(xkdiff)
+            double rightTerm4 = 0.5 * Lk * pow(xkdiffRcp->norm2(), 2); // 0.5*Lk*(xkdiff).dot(xkdiff)
+            if ((leftTerm1 + leftTerm2) <= (rightTerm1 + rightTerm2 + rightTerm3 + rightTerm4)) {
+                break;
+            }
+            // line 10 & 11 of Mazhar, 2015
+            Lk *= 2;
+            tk = 1 / Lk;
+            // if (tk < std::numeric_limits<double>::epsilon() * 10) {
+            //     tk += std::numeric_limits<double>::epsilon() * 10;
+            // }
+            std::cout << Lk << " " << tk << std::endl;
+            // line 12 of Mazhar, 2015
+            xkp1Rcp->update(1.0, *ykRcp, -tk, *gVecRcp, 0.0);
+            clipZero(xkp1Rcp);
+        }
+
+        // line 14-16, Mazhar, 2015
+        thetakp1 = (-thetak * thetak + thetak * sqrt(4 + thetak * thetak)) / 2;
+        double betakp1 = thetak * (1 - thetak) / (thetak * thetak + thetakp1);
+        // ykp1=xkp1+betakp1*(xkp1-xk)
+        ykp1Rcp->update((1 + betakp1), *xkp1Rcp, -betakp1, *xkRcp, 0);
+
+        // check convergence, line 17, Mazhar, 2015. Replace the metric with the minimum-map function
+        // ARcp->apply(*xkp1Rcp, *Axbkp1Rcp);
+        // mvCount++;
+        Axbkp1Rcp->update(1.0, *bRcp, 1.0); // Axkp1 = A*xkp1 in the Lifshitz loop
+        double resPhi = checkResiduePhi(xkp1Rcp, Axbkp1Rcp, tempVecRcp);
+        resPhi = fabs(resPhi);
+
+        // line 18-21, Mazhar, 2015
+        if (resPhi < resmin) {
+            resmin = resPhi;
+            xhatkRcp->update(1.0, *xkp1Rcp, 0.0);
+        }
+
+        // line 22-24, Mazhar, 2015
+        history.push_back(std::array<double, 6>{{1.0 * iteCount, 0, 0, tk, resPhi, 1.0 * mvCount}});
+        if (resPhi < tol) {
+            break;
+        }
+
+        // line 25-28, Mazhar, 2015
+        tempVecRcp->update(1.0, *xkp1Rcp, -1.0, *xkRcp, 0.0);
+        if (gVecRcp->dot(*tempVecRcp) > 0) {
+            ykp1Rcp->scale(1.0, *xkp1Rcp); // ykp1=xkp1
+            thetakp1 = 1;
+        }
+
+        // line 29-30, Mazhar, 2015
+        Lk *= 0.9;
+        tk = 1 / Lk;
+
+        // next iteration
+        // swap the contents of pointers directly, be careful
+        ykRcp.swap(ykp1Rcp); // yk=ykp1, ykp1 to be updated;
+        xkRcp.swap(xkp1Rcp); // xk=xkp1, xkp1 to be updated;
+        thetak = thetakp1;
+    }
+    xsolRcp = xhatkRcp;
+
+    return 0;
+}
+
+class mmNewtonOperator : public TOP {
+  private:
+    Teuchos::RCP<const TOP> AopRcp;
+    Teuchos::RCP<const TV> maskRcp;
+    Teuchos::RCP<TCMAT> precOpRcp;
+
+  public:
+    mmNewtonOperator(const Teuchos::RCP<const TOP> &AopRcp_, const Teuchos::RCP<const TV> &maskRcp_) : AopRcp(AopRcp_) {
+        maskUpdate(maskRcp_);
+    }
+
+    void maskUpdate(const Teuchos::RCP<const TV> &maskRcp_) {
+        maskRcp = maskRcp_;
+        // update precOp
+    }
+
+    void opUpdate(const Teuchos::RCP<const TOP> &AopRcp_) { AopRcp = AopRcp_; }
+
+    ~mmNewtonOperator(){};
+
+    Teuchos::RCP<const TMAP> getDomainMap() const {
+        return this->AopRcp->getDomainMap(); // Get the domain Map of this Operator subclass.
+    }
+    Teuchos::RCP<const TMAP> getRangeMap() const {
+        return this->AopRcp->getRangeMap(); // Get the range Map of this Operator subclass.
+    }
+
+    bool hasTransposeApply() const { return false; }
+
+    // Compute Y := alpha Op X + beta Y.
+    void apply(const TMV &X, TMV &Y, Teuchos::ETransp mode = Teuchos::NO_TRANS,
+               scalar_type alpha = Teuchos::ScalarTraits<scalar_type>::one(),
+               scalar_type beta = Teuchos::ScalarTraits<scalar_type>::zero()) const {
+        // step 1 Y=A*x
+        AopRcp->apply(X, Y);
+        const size_t numVecsX = X.getNumVectors();
+        const size_t numVecsY = Y.getNumVectors();
+        assert(numVecsX == numVecsY);
+        const int localSize = X.getMap()->getNodeNumElements();
+        // step 2  apply the mask
+
+        auto xView = X.getLocalView<Kokkos::HostSpace>();
+        auto yView = Y.getLocalView<Kokkos::HostSpace>();
+        auto maskView = maskRcp->getLocalView<Kokkos::HostSpace>();
+        Y.modify<Kokkos::HostSpace>();
+        for (int c = 0; c < xView.dimension_1(); c++) {
+            for (int i = 0; i < xView.dimension_0(); i++) {
+                if (maskView(i, c) > 0.5) {
+                    yView(i, c) = xView(i, c);
+                }
+            }
+        }
+    }
+};
+
+int CPSolver::LCP_mmNewton(Teuchos::RCP<TV> &xsolRcp, const double tol, const int iteMax, IteHistory &history) const {
+    MPI_Barrier(MPI_COMM_WORLD);
+    int mvCount = 0;
+    if (commRcp->getRank() == 0) {
+        std::cout << "solving mmNewton" << std::endl;
+        std::cout << "ARcp" << ARcp->description() << std::endl;
+    }
+    // map must match
+    TEUCHOS_TEST_FOR_EXCEPTION(!this->mapRcp->isSameAs(*(xsolRcp->getMap())), std::invalid_argument,
+                               "xsolrcp and A operator do not have the same Map.");
+
+    Teuchos::RCP<TV> xRcp = Teuchos::rcp(new TV(*xsolRcp, Teuchos::Copy)); // deep copy, xk=x0
+    Teuchos::RCP<TV> yRcp = Teuchos::rcp(new TV(this->mapRcp.getConst(), false));
+    Teuchos::RCP<TV> xkRcp = Teuchos::rcp(new TV(this->mapRcp.getConst(), false));
+    Teuchos::RCP<TV> ykRcp = Teuchos::rcp(new TV(this->mapRcp.getConst(), false));
+
+    Teuchos::RCP<TV> tempVecRcp = Teuchos::rcp(new TV(this->mapRcp.getConst(), false));
+
+    Teuchos::RCP<TV> dxRcp = Teuchos::rcp(new TV(this->mapRcp.getConst(), true));      // zero out
+    Teuchos::RCP<TV> nablaHRcp = Teuchos::rcp(new TV(this->mapRcp.getConst(), false)); // zero out
+
+    Teuchos::RCP<TV> HmmRcp = Teuchos::rcp(new TV(this->mapRcp.getConst(), false));   // minimum map
+    Teuchos::RCP<TV> HmaskRcp = Teuchos::rcp(new TV(this->mapRcp.getConst(), false)); // minimum map
+
+    // Magic constants
+    const double alpha = 0.5;
+    const double beta = 0.001;
+    const double gamma = 1e-28;
+    const double eps = 1e-14;
+    const double rho = 1e-14;
+    const double gmres_tol = tol;
+    const double tol_abs = 1e-14;
+    const double tol_rel = tol;
+    double err = 1e20;
+    int iteCount = 0;
+
+    // allocate GMRES space
+    Teuchos::RCP<mmNewtonOperator> maskAOpRcp = Teuchos::rcp(new mmNewtonOperator(ARcp, HmaskRcp));
+    // set Belos object
+    Belos::SolverFactory<TOP::scalar_type, TMV, TOP> factory;
+    // Make an empty new parameter list.
+    Teuchos::RCP<Teuchos::ParameterList> solverParams = Teuchos::parameterList();
+    solverParams->set("Num Blocks", 50); // usless for BicgStab. the restart m for GMRES.
+    solverParams->set("Maximum Iterations", 100);
+    solverParams->set("Convergence Tolerance", tol * 10);
+#ifdef DEBUGLCPCOL
+    solverParams->set("Verbosity", Belos::Errors + Belos::Warnings + Belos::TimingDetails + Belos::FinalSummary);
+#else
+    solverParams->set("Verbosity", Belos::Errors + Belos::Warnings);
+#endif
+    auto solverRCP = factory.create("GMRES", solverParams); // Create the GMRES solver.
+    auto problemRCP = Teuchos::rcp(new Belos::LinearProblem<TOP::scalar_type, TMV, TOP>(maskAOpRcp, dxRcp, HmmRcp));
+    problemRCP->setProblem(); // necessary
+    solverRCP->setProblem(problemRCP);
+
+    // TODO: Preconditioner
+    // Teuchos::RCP<TOP> precOp;
+    // problemRCP->setRightPrec(precOp);
+    ARcp->apply(*xRcp, *yRcp);
+    mvCount++;
+    yRcp->update(1.0, *bRcp, 1.0); // y = A.dot(x) + b
+    double oldErr;
+    double tk = 0;
+    while (iteCount++ < iteMax) {
+        // check convergence
+        // xkRcp, ykRcp saves last step
+
+#ifdef DEBUGLCPCOL
+        // detailed tolerance for debug build
+        // check convergence
+        tempVecRcp->update(1.0, *xRcp, -1.0, *xkRcp, 0.0);
+        double resxMax = tempVecRcp->normInf();
+        tempVecRcp->update(1.0, *yRcp, -1.0, *ykRcp, 0.0);
+        double resAxbMax = tempVecRcp->normInf();
+        double resPhi = checkResiduePhi(xkRcp, ykRcp, tempVecRcp);
+        history.push_back(std::array<double, 6>{{1.0 * iteCount, resxMax, resAxbMax, tk, resPhi, 1.0 * mvCount}});
+        if (tk > 0 && fabs(resxMax) < tol && fabs(resAxbMax) < tol && fabs(resPhi) < tol) {
+            // converge, stop
+            break;
+        }
+#else
+        // use simple phi tolerance check
+        double resPhi = checkResiduePhi(xkRcp, ykRcp, tempVecRcp);
+        history.push_back(std::array<double, 6>{{1.0 * iteCount, 0, 0, tk, resPhi, 1.0 * mvCount}});
+        if (tk > 0 && fabs(resPhi) < tol) {
+            break;
+        }
+#endif
+
+        // minimum map, H = minmap(x,y)
+        hMinMap(xRcp, yRcp, HmmRcp, HmaskRcp);
+        oldErr = err; // old_err = err
+        // Calculate merit value, error: err = 0.5*H.dot(H)
+        err = 0.5 * pow(HmmRcp->norm2(), 2);
+
+        //##### Test the stopping criterias used #####
+        double rel_err = fabs(err - oldErr) / fabs(oldErr);
+        if (rel_err < tol_rel || err < tol_abs) {
+            break;
+        }
+
+        /*
+                ##### Solving the Newton system
+            restart = min(N, 20) # Number of iterates done before Restart
+                                 # for GMRES should restart
+            S = np.where(y < x)
+            J = np.identity(N)
+            J[S,:] = A[S,:]
+            dx = np.zeros(N)
+            dx = gmres(J, (-H), tol=gmres_tol, restart=restart)[0].reshape(N)
+        */
+        maskAOpRcp->maskUpdate(HmaskRcp.getConst());
+        // dxRcp->putScalar(0);
+        problemRCP->setProblem(); // necessary to update the solver
+        // solverRCP->setProblem(problemRCP);
+        commRcp->barrier();
+        Belos::ReturnType result = solverRCP->solve(); //  maskAOpRcp *dx = -H, solution is at dxRcp
+        mvCount += solverRCP->getNumIters();
+        dxRcp->scale(-1.0);
+
+        // nabla_H = H.dot(J) # descent direction
+        maskAOpRcp->apply(*HmmRcp, *nablaHRcp);
+
+        //    # Tests whether the search direction is below machine precision.
+        if (dxRcp->normInf() < tol_abs) {
+            if (commRcp->getRank() == 0) {
+                std::cout << "Search direction below machine precision at iteration " << iteCount << std::endl;
+                std::cout << "Using descent direction" << std::endl;
+            }
+            dxRcp->update(-1.0, *nablaHRcp, 0.0); // dx = -nabla_H
+        }
+
+        // # Test whether we are stuck in a local minima
+        if (nablaHRcp->norm2() < tol_abs) {
+            if (commRcp->getRank() == 0) {
+                std::cout << "local minimum" << std::endl;
+            }
+            return 1;
+        }
+
+        //    # Test whether our direction is a sufficient descent direction
+        if (nablaHRcp->dot(*dxRcp) > -rho * pow(dxRcp->norm2(), 2)) {
+            if (commRcp->getRank() == 0) {
+                std::cout << "Non descend direction at iteration " << iteCount
+                          << ", choosing gradient as search direction" << std::endl;
+            }
+            dxRcp->update(-1.0, *nablaHRcp, 0.0);
+        }
+
+        // ##### Armijo backtracking combined with a projected line-search #####
+        double tau = 1.0;
+        double f0 = err;
+        double gradf = beta * nablaHRcp->dot(*dxRcp);
+        // # Perform backtracking line search
+        while (1) {
+            xkRcp->update(1.0, *xRcp, tau, *dxRcp, 0.0); // xk=x + dx*tau
+            clipZero(xkRcp);                             // xk=max(0,xkRcp);
+            ARcp->apply(*xkRcp, *ykRcp);
+            mvCount++;
+            ykRcp->update(1.0, *bRcp, 1.0);            // yk = y_k = np.dot(A,x_k)+b
+            hMinMap(ykRcp, xkRcp, HmmRcp, HmaskRcp);   // H_k = minmap(y_k,x_k)
+            double fk = 0.5 * pow(HmmRcp->norm2(), 2); // f_k = 0.5*(H_k.dot(H_k))
+
+            if (fk <= f0 + tau * gradf) {
+                // # Test Armijo condition for sufficient decrease
+                break;
+            }
+            // # Test whether the stepsize has become too small
+            if (tau * tau < gamma) {
+                break;
+            }
+            tau *= alpha;
+        }
+        // # Update iterate with result from line search.
+        tk = tau;
+        xRcp.swap(xkRcp);
+        yRcp.swap(ykRcp);
+    }
+
+    xsolRcp.swap(xRcp);
+
+    return 0;
+}
+
+int CPSolver::test_LCP(double tol, int maxIte, int solverChoice) {
+    IteHistory history;
+
+    Teuchos::RCP<TV> xsolRcp = Teuchos::rcp(new TV(this->mapRcp.getConst(), true)); // zero initial guess
+
+    if (commRcp->getRank() == 0) {
+        std::cout << "START TEST";
+    }
+
+    std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
+    switch (solverChoice) {
+    case 0:
+        if (commRcp->getRank() == 0) {
+            std::cout << "Solving mmNewton" << std::endl;
+        }
+        LCP_mmNewton(xsolRcp, tol, maxIte, history);
+        break;
+    case 1:
+        if (commRcp->getRank() == 0) {
+            std::cout << "Solving APGD" << std::endl;
+        }
+        LCP_APGD(xsolRcp, tol, maxIte, history);
+        break;
+    case 2:
+        if (commRcp->getRank() == 0) {
+            std::cout << "Solving BBPGD" << std::endl;
+        }
+        LCP_BBPGD(xsolRcp, tol, maxIte, history);
+        break;
+    case 3:
+        if (commRcp->getRank() == 0) {
+            std::cout << "Solving APGD+mmNewton" << std::endl;
+        }
+        LCP_APGD(xsolRcp, 100 * tol, maxIte, history);
+        LCP_mmNewton(xsolRcp, tol, maxIte, history);
+        break;
+    case 4:
+        if (commRcp->getRank() == 0) {
+            std::cout << "Solving BBPGD+mmNewton" << std::endl;
+        }
+        LCP_BBPGD(xsolRcp, 100 * tol, maxIte, history);
+        LCP_mmNewton(xsolRcp, tol, maxIte, history);
+        break;
+    }
+    std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> time_span = std::chrono::duration_cast<std::chrono::duration<double>>(t2 - t1);
+    if (commRcp->getRank() == 0)
+        std::cout << "Solving time: " << time_span.count() << " seconds." << std::endl;
+
+    // test result
+    Teuchos::RCP<TV> AxbRcp = Teuchos::rcp(new TV(this->mapRcp.getConst(), false));
+    ARcp->apply(*xsolRcp, *AxbRcp);  // Ax
+    AxbRcp->update(1.0, *bRcp, 1.0); // Ax+b
+    // dumpTV(xsolRcp, "xsol");
+    // dumpTV(AxbRcp, "Axb");
+    auto xView = xsolRcp->getLocalView<Kokkos::HostSpace>();
+    auto yView = AxbRcp->getLocalView<Kokkos::HostSpace>();
+
+    int xerrorN = 0;
+    double xerrormax = 0.0;
+    int yerrorN = 0;
+    double yerrormax = 0.0;
+    assert(xView.dimension_0() == mapRcp->getNodeNumElements());
+    for (int c = 0; c < xView.dimension_1(); c++) {
+        for (int i = 0; i < xView.dimension_0(); i++) {
+            if (xView(i, c) < 0) {
+                xerrorN++;
+                xerrormax = std::max(xerrormax, static_cast<double>(-xView(i, c)));
+            }
+            if (yView(i, c) < 0) {
+                yerrorN++;
+                yerrormax = std::max(yerrormax, static_cast<double>(-yView(i, c)));
+            }
+        }
+    }
+
+    MPI_Barrier(MPI_COMM_WORLD);
+    if (commRcp->getRank() == 0) {
+        // std::cout << myRank << std::endl;
+        MPI_Reduce(MPI_IN_PLACE, &xerrorN, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
+        MPI_Reduce(MPI_IN_PLACE, &yerrorN, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
+        MPI_Reduce(MPI_IN_PLACE, &xerrormax, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
+        MPI_Reduce(MPI_IN_PLACE, &yerrormax, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
+        MPI_Barrier(MPI_COMM_WORLD);
+
+        // std::cout << myRank << std::endl;
+    } else {
+        // std::cout << myRank << std::endl;
+        int tempint;
+        double tempdouble;
+        MPI_Reduce(&xerrorN, &tempint, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
+        MPI_Reduce(&yerrorN, &tempint, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
+        MPI_Reduce(&xerrormax, &tempdouble, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
+        MPI_Reduce(&yerrormax, &tempdouble, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
+        MPI_Barrier(MPI_COMM_WORLD);
+        // std::cout << myRank << std::endl;
+    }
+
+    if (commRcp->getRank() == 0) {
+        for (auto &p : history) {
+            std::cout << p[0] << " " << p[1] << " " << p[2] << " " << p[3] << " " << p[4] << " " << p[5] << std::endl;
+        }
+    }
+
+    if (commRcp->getRank() == 0) {
+        std::cout << "solution quality: " << std::endl;
+        std::cout << "negative x N: " << std::scientific << xerrorN << std::endl;
+        std::cout << "xerror max: " << std::scientific << xerrormax << std::endl;
+        std::cout << "negative y N: " << std::scientific << yerrorN << std::endl;
+        std::cout << "yerror max: " << std::scientific << yerrormax << std::endl;
+        std::cout << "Solving time: " << time_span.count() << " seconds." << std::endl;
+        // double dotyTx = AxbRcp->dot(*xsolRcp);
+        // std::cout << "y^T x: " << std::scientific << dotyTx << std::endl;
+        // stuck for >=2 processors, unknown
+    }
+
+    return 0;
+}

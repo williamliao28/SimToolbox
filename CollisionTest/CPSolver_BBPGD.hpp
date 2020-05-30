@@ -162,7 +162,7 @@ class CPSolver {
      * @param history iteration history
      * @return int return error code. 0 for normal execution.
      */
-    //int LCP_APGD(Teuchos::RCP<TV> &xsolRcp, const double tol, const int iteMax, IteHistory &history) const;
+    int LCP_APGD(Teuchos::RCP<TV> &xsolRcp, const double tol, const int iteMax, IteHistory &history) const;
 
     /**
      * @brief Barzilai-Borwein PGD
@@ -184,7 +184,7 @@ class CPSolver {
      * @param history iteration history
      * @return int return error code. 0 for normal execution.
      */
-    //int LCP_mmNewton(Teuchos::RCP<TV> &xsolRcp, const double tol, const int iteMax, IteHistory &history) const;
+    int LCP_mmNewton(Teuchos::RCP<TV> &xsolRcp, const double tol, const int iteMax, IteHistory &history) const;
 
     /**
      * @brief self test
@@ -194,7 +194,7 @@ class CPSolver {
      * @param solverChoice
      * @return int
      */
-    //int test_LCP(double tol, int maxIte, int solverChoice);
+    int test_LCP(double tol, int maxIte, int solverChoice);
 
   private:
     Teuchos::RCP<const TOP> ARcp;      ///< linear operator \f$A\f$
