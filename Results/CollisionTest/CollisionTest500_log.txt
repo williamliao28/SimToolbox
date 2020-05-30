@@ -1,0 +1,514 @@
+nohup: ignoring input
+build/CollisionTest
+Test problem size: 500
+-------------------------------------------------
+Number of OpenMP threads: 1
+Executing command: build/CollisionTest/CPSolver_test 500 ...
+------------------------------------------------------
+--------------------------------------------------------------------------
+[[43736,1],0]: A high-performance Open MPI point-to-point messaging module
+was unable to find any relevant network interfaces:
+
+Module: OpenFabrics (openib)
+  Host: dolcissimo
+
+Another transport will be used instead, although this may result in
+lower performance.
+--------------------------------------------------------------------------
+Number of threads: 1
+Kokkos::OpenMP::initialize WARNING: OMP_PROC_BIND environment variable not set
+  In general, for best performance with OpenMP 4.0 or better set OMP_PROC_BIND=spread and OMP_PLACES=threads
+  For best performance with OpenMP 3.1 set OMP_PROC_BIND=true
+  For unit testing set OMP_PROC_BIND=false
+Total number of processes: 1
+rank: 0
+global size: 500
+local size: 500
+map: Tpetra::Map: {LocalOrdinalType: int, GlobalOrdinalType: int, NodeType: Kokkos::Compat::KokkosDeviceWrapperNode<Kokkos::OpenMP, Kokkos::HostSpace>, Global number of entries: 500, Number of processes: 1, Uniform: false, Contiguous: true, Distributed: false}
+ARcpTpetra::CrsMatrix (Kokkos refactor): {isFillComplete: true, global dimensions: [500, 500], global number of entries: 250000}
+dumping Amat_TCMAT.mtx
+0: writeSparse
+0: writeSparse
+-- 0: past barrier
+-- Input sparse matrix is:---- 500 x 500
+---- Locally indexed.
+---- Its row map has 500 elements.
+---- Its col map has 500 elements.
+-- 0: making gatherRowMap
+ 0: computeGatherMap:
+ 0: computeGatherMap: done
+ 0: computeGatherMap:
+  0: computeGatherMap: Calling createOneToOne
+ 0: computeGatherMap: done
+-- Output sparse matrix is:---- 500 x 500 with 250000 entries;
+---- Locally indexed.
+---- Its row map has 500 elements, with index base 0.
+---- Its col map has 500 elements, with index base 0.
+---- Element count of output matrix's column Map may differ from that of the input matrix's column Map, if some columns of the matrix contain no entries.
+dumping bvec_TV.mtx
+START TESTSolving BBPGD
+solving BBPGD
+ARcpTpetra::CrsMatrix (Kokkos refactor): {isFillComplete: true, global dimensions: [500, 500], global number of entries: 250000}
+Solving time: 0.0439914 seconds.
+0 0 0 0 9.13217 1
+1 0 0 0.00113948 0.0104059 3
+2 0 0 1.64381e-05 0.00217116 4
+3 0 0 1.53102e-05 0.00164273 5
+4 0 0 3.92861e-05 0.000945533 6
+5 0 0 4.97406e-05 0.000760693 7
+6 0 0 7.55692e-05 0.0286362 8
+7 0 0 9.4083e-05 0.138747 9
+8 0 0 0.000202944 0.149883 10
+9 0 0 0.00803117 0.00184861 11
+10 0 0 0.000372864 3.29288 12
+11 0 0 0.000235281 0.00113859 13
+12 0 0 3.30727e-05 0.0943795 14
+13 0 0 2.9784e-05 0.199941 15
+14 0 0 0.000122429 0.307054 16
+15 0 0 0.00074354 0.000976257 17
+16 0 0 0.000252324 0.68747 18
+17 0 0 0.000138863 0.000892626 19
+18 0 0 0.000103432 0.16594 20
+19 0 0 0.000114847 0.094364 21
+20 0 0 0.000299253 0.0299345 22
+21 0 0 0.000769457 0.0479511 23
+22 0 0 0.00567663 0.00121635 24
+23 0 0 0.000406016 0.458722 25
+24 0 0 0.000259772 0.00102303 26
+25 0 0 0.000138375 0.0765921 27
+26 0 0 0.000123843 0.0510573 28
+27 0 0 0.000637165 0.00103384 29
+28 0 0 0.000391961 0.0479223 30
+29 0 0 0.000241455 0.00783712 31
+30 0 0 0.000273731 0.00736226 32
+31 0 0 0.00930612 0.00109477 33
+32 0 0 0.000507032 0.13623 34
+33 0 0 0.000290973 0.00104936 35
+34 0 0 0.000226399 0.0116102 36
+35 0 0 0.000254544 0.0055888 37
+36 0 0 0.00140621 0.00105411 38
+37 0 0 0.000477092 0.0108709 39
+38 0 0 0.000291271 0.000424498 40
+39 0 0 0.000291646 0.000417828 41
+40 0 0 0.0110709 4.82442e-05 42
+41 0 0 0.0112752 3.96288e-05 43
+42 0 0 0.00902755 0.00088713 44
+43 0 0 0.000336062 0.000171105 45
+44 0 0 0.000290969 1.54102e-06 46
+solution quality: 
+negative x N: 0
+xerror max: 0.000000e+00
+negative y N: 7
+yerror max: 5.641930e-07
+Solving time: 4.399138e-02 seconds.
+------------------------------------------------------
+Number of OpenMP threads: 2
+Executing command: build/CollisionTest/CPSolver_test 500 ...
+------------------------------------------------------
+--------------------------------------------------------------------------
+[[43742,1],0]: A high-performance Open MPI point-to-point messaging module
+was unable to find any relevant network interfaces:
+
+Module: OpenFabrics (openib)
+  Host: dolcissimo
+
+Another transport will be used instead, although this may result in
+lower performance.
+--------------------------------------------------------------------------
+Number of threads: 2
+Kokkos::OpenMP::initialize WARNING: OMP_PROC_BIND environment variable not set
+  In general, for best performance with OpenMP 4.0 or better set OMP_PROC_BIND=spread and OMP_PLACES=threads
+  For best performance with OpenMP 3.1 set OMP_PROC_BIND=true
+  For unit testing set OMP_PROC_BIND=false
+Read A ...
+ARcpTpetra::CrsMatrix (Kokkos refactor): {isFillComplete: true, global dimensions: [500, 500], global number of entries: 250000}
+Total number of processes: 1
+rank: 0
+global size: 500
+local size: 500
+map: Tpetra::Map: {LocalOrdinalType: int, GlobalOrdinalType: int, NodeType: Kokkos::Compat::KokkosDeviceWrapperNode<Kokkos::OpenMP, Kokkos::HostSpace>, Global number of entries: 500, Number of processes: 1, Uniform: false, Contiguous: true, Distributed: false}
+Read b ...
+START TESTSolving BBPGD
+solving BBPGD
+ARcpTpetra::CrsMatrix (Kokkos refactor): {isFillComplete: true, global dimensions: [500, 500], global number of entries: 250000}
+Solving time: 0.0373034 seconds.
+0 0 0 0 9.13217 1
+1 0 0 0.00113948 0.0104059 3
+2 0 0 1.64381e-05 0.00217116 4
+3 0 0 1.53102e-05 0.00164273 5
+4 0 0 3.92861e-05 0.000945533 6
+5 0 0 4.97406e-05 0.000760693 7
+6 0 0 7.55692e-05 0.0286362 8
+7 0 0 9.4083e-05 0.138747 9
+8 0 0 0.000202944 0.149883 10
+9 0 0 0.00803117 0.00184861 11
+10 0 0 0.000372864 3.29288 12
+11 0 0 0.000235281 0.00113859 13
+12 0 0 3.30727e-05 0.0943795 14
+13 0 0 2.9784e-05 0.199941 15
+14 0 0 0.000122429 0.307054 16
+15 0 0 0.00074354 0.000976257 17
+16 0 0 0.000252324 0.68747 18
+17 0 0 0.000138863 0.000892626 19
+18 0 0 0.000103432 0.16594 20
+19 0 0 0.000114847 0.094364 21
+20 0 0 0.000299253 0.0299345 22
+21 0 0 0.000769457 0.0479511 23
+22 0 0 0.00567663 0.00121635 24
+23 0 0 0.000406016 0.458722 25
+24 0 0 0.000259772 0.00102303 26
+25 0 0 0.000138375 0.0765921 27
+26 0 0 0.000123843 0.0510573 28
+27 0 0 0.000637165 0.00103384 29
+28 0 0 0.000391961 0.0479223 30
+29 0 0 0.000241455 0.00783712 31
+30 0 0 0.000273731 0.00736226 32
+31 0 0 0.00930612 0.00109477 33
+32 0 0 0.000507032 0.13623 34
+33 0 0 0.000290973 0.00104936 35
+34 0 0 0.000226399 0.0116102 36
+35 0 0 0.000254544 0.0055888 37
+36 0 0 0.00140621 0.00105411 38
+37 0 0 0.000477092 0.0108709 39
+38 0 0 0.000291271 0.000424498 40
+39 0 0 0.000291646 0.000417828 41
+40 0 0 0.0110709 4.82442e-05 42
+41 0 0 0.0112752 3.96288e-05 43
+42 0 0 0.00902755 0.00088713 44
+43 0 0 0.000336062 0.000171105 45
+44 0 0 0.000290969 1.54102e-06 46
+solution quality: 
+negative x N: 0
+xerror max: 0.000000e+00
+negative y N: 7
+yerror max: 5.641930e-07
+Solving time: 3.730337e-02 seconds.
+------------------------------------------------------
+Number of OpenMP threads: 4
+Executing command: build/CollisionTest/CPSolver_test 500 ...
+------------------------------------------------------
+--------------------------------------------------------------------------
+[[43554,1],0]: A high-performance Open MPI point-to-point messaging module
+was unable to find any relevant network interfaces:
+
+Module: OpenFabrics (openib)
+  Host: dolcissimo
+
+Another transport will be used instead, although this may result in
+lower performance.
+--------------------------------------------------------------------------
+Number of threads: 4
+Kokkos::OpenMP::initialize WARNING: OMP_PROC_BIND environment variable not set
+  In general, for best performance with OpenMP 4.0 or better set OMP_PROC_BIND=spread and OMP_PLACES=threads
+  For best performance with OpenMP 3.1 set OMP_PROC_BIND=true
+  For unit testing set OMP_PROC_BIND=false
+Read A ...
+ARcpTpetra::CrsMatrix (Kokkos refactor): {isFillComplete: true, global dimensions: [500, 500], global number of entries: 250000}
+Total number of processes: 1
+rank: 0
+global size: 500
+local size: 500
+map: Tpetra::Map: {LocalOrdinalType: int, GlobalOrdinalType: int, NodeType: Kokkos::Compat::KokkosDeviceWrapperNode<Kokkos::OpenMP, Kokkos::HostSpace>, Global number of entries: 500, Number of processes: 1, Uniform: false, Contiguous: true, Distributed: false}
+Read b ...
+START TESTSolving BBPGD
+solving BBPGD
+ARcpTpetra::CrsMatrix (Kokkos refactor): {isFillComplete: true, global dimensions: [500, 500], global number of entries: 250000}
+Solving time: 0.0220936 seconds.
+0 0 0 0 9.13217 1
+1 0 0 0.00113948 0.0104059 3
+2 0 0 1.64381e-05 0.00217116 4
+3 0 0 1.53102e-05 0.00164273 5
+4 0 0 3.92861e-05 0.000945533 6
+5 0 0 4.97406e-05 0.000760693 7
+6 0 0 7.55692e-05 0.0286362 8
+7 0 0 9.4083e-05 0.138747 9
+8 0 0 0.000202944 0.149883 10
+9 0 0 0.00803117 0.00184861 11
+10 0 0 0.000372864 3.29288 12
+11 0 0 0.000235281 0.00113859 13
+12 0 0 3.30727e-05 0.0943795 14
+13 0 0 2.9784e-05 0.199941 15
+14 0 0 0.000122429 0.307054 16
+15 0 0 0.00074354 0.000976257 17
+16 0 0 0.000252324 0.68747 18
+17 0 0 0.000138863 0.000892626 19
+18 0 0 0.000103432 0.16594 20
+19 0 0 0.000114847 0.094364 21
+20 0 0 0.000299253 0.0299345 22
+21 0 0 0.000769457 0.0479511 23
+22 0 0 0.00567663 0.00121635 24
+23 0 0 0.000406016 0.458722 25
+24 0 0 0.000259772 0.00102303 26
+25 0 0 0.000138375 0.0765921 27
+26 0 0 0.000123843 0.0510573 28
+27 0 0 0.000637165 0.00103384 29
+28 0 0 0.000391961 0.0479223 30
+29 0 0 0.000241455 0.00783712 31
+30 0 0 0.000273731 0.00736226 32
+31 0 0 0.00930612 0.00109477 33
+32 0 0 0.000507032 0.13623 34
+33 0 0 0.000290973 0.00104936 35
+34 0 0 0.000226399 0.0116102 36
+35 0 0 0.000254544 0.0055888 37
+36 0 0 0.00140621 0.00105411 38
+37 0 0 0.000477092 0.0108709 39
+38 0 0 0.000291271 0.000424498 40
+39 0 0 0.000291646 0.000417828 41
+40 0 0 0.0110709 4.82442e-05 42
+41 0 0 0.0112752 3.96288e-05 43
+42 0 0 0.00902755 0.00088713 44
+43 0 0 0.000336062 0.000171105 45
+44 0 0 0.000290969 1.54102e-06 46
+solution quality: 
+negative x N: 0
+xerror max: 0.000000e+00
+negative y N: 7
+yerror max: 5.641930e-07
+Solving time: 2.209358e-02 seconds.
+------------------------------------------------------
+Number of OpenMP threads: 8
+Executing command: build/CollisionTest/CPSolver_test 500 ...
+------------------------------------------------------
+--------------------------------------------------------------------------
+[[43569,1],0]: A high-performance Open MPI point-to-point messaging module
+was unable to find any relevant network interfaces:
+
+Module: OpenFabrics (openib)
+  Host: dolcissimo
+
+Another transport will be used instead, although this may result in
+lower performance.
+--------------------------------------------------------------------------
+Number of threads: 8
+Kokkos::OpenMP::initialize WARNING: OMP_PROC_BIND environment variable not set
+  In general, for best performance with OpenMP 4.0 or better set OMP_PROC_BIND=spread and OMP_PLACES=threads
+  For best performance with OpenMP 3.1 set OMP_PROC_BIND=true
+  For unit testing set OMP_PROC_BIND=false
+Read A ...
+ARcpTpetra::CrsMatrix (Kokkos refactor): {isFillComplete: true, global dimensions: [500, 500], global number of entries: 250000}
+Total number of processes: 1
+rank: 0
+global size: 500
+local size: 500
+map: Tpetra::Map: {LocalOrdinalType: int, GlobalOrdinalType: int, NodeType: Kokkos::Compat::KokkosDeviceWrapperNode<Kokkos::OpenMP, Kokkos::HostSpace>, Global number of entries: 500, Number of processes: 1, Uniform: false, Contiguous: true, Distributed: false}
+Read b ...
+START TESTSolving BBPGD
+solving BBPGD
+ARcpTpetra::CrsMatrix (Kokkos refactor): {isFillComplete: true, global dimensions: [500, 500], global number of entries: 250000}
+Solving time: 0.016336 seconds.
+0 0 0 0 9.13217 1
+1 0 0 0.00113948 0.0104059 3
+2 0 0 1.64381e-05 0.00217116 4
+3 0 0 1.53102e-05 0.00164273 5
+4 0 0 3.92861e-05 0.000945533 6
+5 0 0 4.97406e-05 0.000760693 7
+6 0 0 7.55692e-05 0.0286362 8
+7 0 0 9.4083e-05 0.138747 9
+8 0 0 0.000202944 0.149883 10
+9 0 0 0.00803117 0.00184861 11
+10 0 0 0.000372864 3.29288 12
+11 0 0 0.000235281 0.00113859 13
+12 0 0 3.30727e-05 0.0943795 14
+13 0 0 2.9784e-05 0.199941 15
+14 0 0 0.000122429 0.307054 16
+15 0 0 0.00074354 0.000976257 17
+16 0 0 0.000252324 0.68747 18
+17 0 0 0.000138863 0.000892626 19
+18 0 0 0.000103432 0.16594 20
+19 0 0 0.000114847 0.094364 21
+20 0 0 0.000299253 0.0299345 22
+21 0 0 0.000769457 0.0479511 23
+22 0 0 0.00567663 0.00121635 24
+23 0 0 0.000406016 0.458722 25
+24 0 0 0.000259772 0.00102303 26
+25 0 0 0.000138375 0.0765921 27
+26 0 0 0.000123843 0.0510573 28
+27 0 0 0.000637165 0.00103384 29
+28 0 0 0.000391961 0.0479223 30
+29 0 0 0.000241455 0.00783712 31
+30 0 0 0.000273731 0.00736226 32
+31 0 0 0.00930612 0.00109477 33
+32 0 0 0.000507032 0.13623 34
+33 0 0 0.000290973 0.00104936 35
+34 0 0 0.000226399 0.0116102 36
+35 0 0 0.000254544 0.0055888 37
+36 0 0 0.00140621 0.00105411 38
+37 0 0 0.000477092 0.0108709 39
+38 0 0 0.000291271 0.000424498 40
+39 0 0 0.000291646 0.000417828 41
+40 0 0 0.0110709 4.82442e-05 42
+41 0 0 0.0112752 3.96288e-05 43
+42 0 0 0.00902755 0.00088713 44
+43 0 0 0.000336062 0.000171105 45
+44 0 0 0.000290969 1.54102e-06 46
+solution quality: 
+negative x N: 0
+xerror max: 0.000000e+00
+negative y N: 7
+yerror max: 5.641930e-07
+Solving time: 1.633603e-02 seconds.
+------------------------------------------------------
+Number of OpenMP threads: 16
+Executing command: build/CollisionTest/CPSolver_test 500 ...
+------------------------------------------------------
+--------------------------------------------------------------------------
+[[43579,1],0]: A high-performance Open MPI point-to-point messaging module
+was unable to find any relevant network interfaces:
+
+Module: OpenFabrics (openib)
+  Host: dolcissimo
+
+Another transport will be used instead, although this may result in
+lower performance.
+--------------------------------------------------------------------------
+Number of threads: 16
+Kokkos::OpenMP::initialize WARNING: OMP_PROC_BIND environment variable not set
+  In general, for best performance with OpenMP 4.0 or better set OMP_PROC_BIND=spread and OMP_PLACES=threads
+  For best performance with OpenMP 3.1 set OMP_PROC_BIND=true
+  For unit testing set OMP_PROC_BIND=false
+Read A ...
+ARcpTpetra::CrsMatrix (Kokkos refactor): {isFillComplete: true, global dimensions: [500, 500], global number of entries: 250000}
+Total number of processes: 1
+rank: 0
+global size: 500
+local size: 500
+map: Tpetra::Map: {LocalOrdinalType: int, GlobalOrdinalType: int, NodeType: Kokkos::Compat::KokkosDeviceWrapperNode<Kokkos::OpenMP, Kokkos::HostSpace>, Global number of entries: 500, Number of processes: 1, Uniform: false, Contiguous: true, Distributed: false}
+Read b ...
+START TESTSolving BBPGD
+solving BBPGD
+ARcpTpetra::CrsMatrix (Kokkos refactor): {isFillComplete: true, global dimensions: [500, 500], global number of entries: 250000}
+Solving time: 0.0238363 seconds.
+0 0 0 0 9.13217 1
+1 0 0 0.00113948 0.0104059 3
+2 0 0 1.64381e-05 0.00217116 4
+3 0 0 1.53102e-05 0.00164273 5
+4 0 0 3.92861e-05 0.000945533 6
+5 0 0 4.97406e-05 0.000760693 7
+6 0 0 7.55692e-05 0.0286362 8
+7 0 0 9.4083e-05 0.138747 9
+8 0 0 0.000202944 0.149883 10
+9 0 0 0.00803117 0.00184861 11
+10 0 0 0.000372864 3.29288 12
+11 0 0 0.000235281 0.00113859 13
+12 0 0 3.30727e-05 0.0943795 14
+13 0 0 2.9784e-05 0.199941 15
+14 0 0 0.000122429 0.307054 16
+15 0 0 0.00074354 0.000976257 17
+16 0 0 0.000252324 0.68747 18
+17 0 0 0.000138863 0.000892626 19
+18 0 0 0.000103432 0.16594 20
+19 0 0 0.000114847 0.094364 21
+20 0 0 0.000299253 0.0299345 22
+21 0 0 0.000769457 0.0479511 23
+22 0 0 0.00567663 0.00121635 24
+23 0 0 0.000406016 0.458722 25
+24 0 0 0.000259772 0.00102303 26
+25 0 0 0.000138375 0.0765921 27
+26 0 0 0.000123843 0.0510573 28
+27 0 0 0.000637165 0.00103384 29
+28 0 0 0.000391961 0.0479223 30
+29 0 0 0.000241455 0.00783712 31
+30 0 0 0.000273731 0.00736226 32
+31 0 0 0.00930612 0.00109477 33
+32 0 0 0.000507032 0.13623 34
+33 0 0 0.000290973 0.00104936 35
+34 0 0 0.000226399 0.0116102 36
+35 0 0 0.000254544 0.0055888 37
+36 0 0 0.00140621 0.00105411 38
+37 0 0 0.000477092 0.0108709 39
+38 0 0 0.000291271 0.000424498 40
+39 0 0 0.000291646 0.000417828 41
+40 0 0 0.0110709 4.82442e-05 42
+41 0 0 0.0112752 3.96288e-05 43
+42 0 0 0.00902755 0.00088713 44
+43 0 0 0.000336062 0.000171105 45
+44 0 0 0.000290969 1.54102e-06 46
+solution quality: 
+negative x N: 0
+xerror max: 0.000000e+00
+negative y N: 7
+yerror max: 5.641930e-07
+Solving time: 2.383634e-02 seconds.
+------------------------------------------------------
+Number of OpenMP threads: 24
+Executing command: build/CollisionTest/CPSolver_test 500 ...
+------------------------------------------------------
+--------------------------------------------------------------------------
+[[43538,1],0]: A high-performance Open MPI point-to-point messaging module
+was unable to find any relevant network interfaces:
+
+Module: OpenFabrics (openib)
+  Host: dolcissimo
+
+Another transport will be used instead, although this may result in
+lower performance.
+--------------------------------------------------------------------------
+Number of threads: 24
+Kokkos::OpenMP::initialize WARNING: OMP_PROC_BIND environment variable not set
+  In general, for best performance with OpenMP 4.0 or better set OMP_PROC_BIND=spread and OMP_PLACES=threads
+  For best performance with OpenMP 3.1 set OMP_PROC_BIND=true
+  For unit testing set OMP_PROC_BIND=false
+Read A ...
+ARcpTpetra::CrsMatrix (Kokkos refactor): {isFillComplete: true, global dimensions: [500, 500], global number of entries: 250000}
+Total number of processes: 1
+rank: 0
+global size: 500
+local size: 500
+map: Tpetra::Map: {LocalOrdinalType: int, GlobalOrdinalType: int, NodeType: Kokkos::Compat::KokkosDeviceWrapperNode<Kokkos::OpenMP, Kokkos::HostSpace>, Global number of entries: 500, Number of processes: 1, Uniform: false, Contiguous: true, Distributed: false}
+Read b ...
+START TESTSolving BBPGD
+solving BBPGD
+ARcpTpetra::CrsMatrix (Kokkos refactor): {isFillComplete: true, global dimensions: [500, 500], global number of entries: 250000}
+Solving time: 1.80252 seconds.
+0 0 0 0 9.13217 1
+1 0 0 0.00113948 0.0104059 3
+2 0 0 1.64381e-05 0.00217116 4
+3 0 0 1.53102e-05 0.00164273 5
+4 0 0 3.92861e-05 0.000945533 6
+5 0 0 4.97406e-05 0.000760693 7
+6 0 0 7.55692e-05 0.0286362 8
+7 0 0 9.4083e-05 0.138747 9
+8 0 0 0.000202944 0.149883 10
+9 0 0 0.00803117 0.00184861 11
+10 0 0 0.000372864 3.29288 12
+11 0 0 0.000235281 0.00113859 13
+12 0 0 3.30727e-05 0.0943795 14
+13 0 0 2.9784e-05 0.199941 15
+14 0 0 0.000122429 0.307054 16
+15 0 0 0.00074354 0.000976257 17
+16 0 0 0.000252324 0.68747 18
+17 0 0 0.000138863 0.000892626 19
+18 0 0 0.000103432 0.16594 20
+19 0 0 0.000114847 0.094364 21
+20 0 0 0.000299253 0.0299345 22
+21 0 0 0.000769457 0.0479511 23
+22 0 0 0.00567663 0.00121635 24
+23 0 0 0.000406016 0.458722 25
+24 0 0 0.000259772 0.00102303 26
+25 0 0 0.000138375 0.0765921 27
+26 0 0 0.000123843 0.0510573 28
+27 0 0 0.000637165 0.00103384 29
+28 0 0 0.000391961 0.0479223 30
+29 0 0 0.000241455 0.00783712 31
+30 0 0 0.000273731 0.00736226 32
+31 0 0 0.00930612 0.00109477 33
+32 0 0 0.000507032 0.13623 34
+33 0 0 0.000290973 0.00104936 35
+34 0 0 0.000226399 0.0116102 36
+35 0 0 0.000254544 0.0055888 37
+36 0 0 0.00140621 0.00105411 38
+37 0 0 0.000477092 0.0108709 39
+38 0 0 0.000291271 0.000424498 40
+39 0 0 0.000291646 0.000417828 41
+40 0 0 0.0110709 4.82442e-05 42
+41 0 0 0.0112752 3.96288e-05 43
+42 0 0 0.00902755 0.00088713 44
+43 0 0 0.000336062 0.000171105 45
+44 0 0 0.000290969 1.54102e-06 46
+solution quality: 
+negative x N: 0
+xerror max: 0.000000e+00
+negative y N: 7
+yerror max: 5.641930e-07
+Solving time: 1.802518e+00 seconds.
+------------------------------------------------------
