@@ -5,7 +5,7 @@ module load intel-mkl
 root="build/CollisionTest"
 echo $root
 
-testsize=500
+testsize=2000
 echo "Test problem size: $testsize"
 echo "-------------------------------------------------"
 
