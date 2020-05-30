@@ -258,6 +258,10 @@ void CPSolver::CPReadA(std::string filename) {
     Tpetra::MatrixMarket::Reader<TCMAT> matDumper;
     Teuchos::RCP<TCMAT> Atemp = matDumper.readSparseFile(filename, commRcp, true, false, false);
     this->ARcp = Teuchos::rcp_dynamic_cast<const TOP>(Atemp, true);
+    if (commRcp->getRank() == 0)
+    {
+        std::cout << "Read A ..." << std::endl;
+    }    
     std::cout << "ARcp" << ARcp->description() << std::endl;
 }
 
@@ -265,13 +269,24 @@ void CPSolver::CPReadA(std::string filename) {
 void CPSolver::CPReadb(std::string filename) {
     // set up comm
     commRcp = getMPIWORLDTCOMM();
+    // set map
+    Teuchos::RCP<const TMAP> rowMapRcp = getTMAPFromLocalSize(localSize, commRcp);
+    mapRcp = rowMapRcp;
+    if (commRcp->getRank() == 0) {
+        std::cout << "Total number of processes: " << commRcp->getSize() << std::endl;
+        std::cout << "rank: " << commRcp->getRank() << std::endl;
+        std::cout << "global size: " << mapRcp->getGlobalNumElements() << std::endl;
+        std::cout << "local size: " << mapRcp->getNodeNumElements() << std::endl;
+        std::cout << "map: " << mapRcp->description() << std::endl;
+        std::cout << "Read b ..." << std::endl;
+    }
     // read file
     Tpetra::MatrixMarket::Reader<TV> matDumper;
-    this->bRcp = matDumper.readDenseFile(filename, commRcp, true, false, false);
+    this->bRcp = matDumper.readDenseFile(filename, commRcp, mapRcp, false, false);
 }
 
 // constructor to set random A and b with given size
-CPSolver::CPSolver(int localSize, double diagonal, int threadnum) {
+CPSolver::CPSolver(int localSize, int threadnum, double diagonal) {
     if(threadnum == 1){
     // set up comm
     commRcp = getMPIWORLDTCOMM();
@@ -379,7 +394,7 @@ CPSolver::CPSolver(int localSize, double diagonal, int threadnum) {
     // dump matrix
     dumpTCMAT(Atemp, "Amat");
     dumpTV(bRcp, "bvec");
-    }elseif(threadnum > 1)
+    }else if(threadnum > 1)
     {
         CPReadA("Amat");
         CPReadb("bvec");

@@ -148,10 +148,10 @@ class CPSolver {
      * @brief Construct a new CPSolver object generating \f$A,b\f$ for internal test
      *
      * @param localSize
-     * @param diagonal
      * @param threadnum
+     * @param diagonal
      */
-    CPSolver(int localSize, double diagonal = 0.0, int threadnum);
+    CPSolver(int localSize, int threadnum, double diagonal = 0.0);
 
     /**
      * @brief Nesterov accelerated PGD
@@ -250,7 +250,7 @@ class CPSolver {
      * @return double the residual
      */
     //double checkResiduePhi(const Teuchos::RCP<const TV> &vecXRcp, const Teuchos::RCP<const TV> &vecYRcp,
-                           const Teuchos::RCP<const TV> &vecbRcp, const Teuchos::RCP<TV> &vecTempRcp) const;
+    //                       const Teuchos::RCP<const TV> &vecbRcp, const Teuchos::RCP<TV> &vecTempRcp) const;
 
     /**
      * @brief   compute the residual function with Y = Ax+b
