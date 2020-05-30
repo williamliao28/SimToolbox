@@ -275,7 +275,7 @@ class CPSolver {
      *
      * @param filename
      */
-    void CPReadb(std::string filename);
+    void CPReadb(int localSize, std::string filename);
 };
 
 #endif
