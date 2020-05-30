@@ -284,7 +284,7 @@ void CPSolver::CPReadb(int localSize, std::string filename) {
     //Teuchos::RCP<TV> btemp = Teuchos::rcp(new TV(rowMapRcp, false));
     // read file
     Tpetra::MatrixMarket::Reader<TV> matDumper;
-    bRcp = matDumper.readDenseFile(filename, commRcp, this->mapRcp.getConst(), false, false);
+    bRcp = matDumper.readVectorFile(filename, commRcp, this->mapRcp.getConst(), false, false);
     //this->bRcp = btemp.getConst();
 }
 
