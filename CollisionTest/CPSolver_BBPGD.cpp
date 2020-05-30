@@ -281,11 +281,11 @@ void CPSolver::CPReadb(int localSize, std::string filename) {
         std::cout << "Read b ..." << std::endl;
     }
     // set tempb to read file
-    Teuchos::RCP<TV> btemp = Teuchos::rcp(new TV(rowMapRcp, false));
+    //Teuchos::RCP<TV> btemp = Teuchos::rcp(new TV(rowMapRcp, false));
     // read file
     Tpetra::MatrixMarket::Reader<TV> matDumper;
-    btemp = matDumper.readDenseFile(filename, commRcp, this->mapRcp.getConst(), false, false);
-    this->bRcp = btemp.getConst();
+    bRcp = matDumper.readDenseFile(filename, commRcp, this->mapRcp.getConst(), false, false);
+    //this->bRcp = btemp.getConst();
 }
 
 // constructor to set random A and b with given size
