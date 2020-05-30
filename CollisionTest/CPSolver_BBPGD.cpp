@@ -282,7 +282,7 @@ void CPSolver::CPReadb(int localSize, std::string filename) {
     }
     // read file
     Tpetra::MatrixMarket::Reader<TV> matDumper;
-    this->bRcp = matDumper.readDenseFile(filename, commRcp, &mapRcp, false, false);
+    this->bRcp = matDumper.readDenseFile(filename, commRcp, this->mapRcp, false, false);
 }
 
 // constructor to set random A and b with given size
