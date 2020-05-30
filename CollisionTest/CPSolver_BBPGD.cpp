@@ -1,4 +1,4 @@
-#include "CPSolver.hpp"
+#include "CPSolver_BBPGD.hpp"
 #include "Trilinos/TpetraUtil.hpp"
 
 #include <mpi.h>
