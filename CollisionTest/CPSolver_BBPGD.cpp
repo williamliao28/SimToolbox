@@ -399,8 +399,8 @@ CPSolver::CPSolver(int localSize, int threadnum, double diagonal) {
     dumpTV(bRcp, "bvec");
     }else if(threadnum > 1)
     {
-        CPReadA("Amat");
-        CPReadb(localSize, "bvec");
+        CPReadA("Amat_TCMAT.mtx");
+        CPReadb(localSize, "bvec_TV.mtx");
     }
     
 }
