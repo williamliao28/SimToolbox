@@ -290,7 +290,7 @@ void CPSolver::CPReadb(int localSize, std::string filename) {
 
 // constructor to set random A and b with given size
 CPSolver::CPSolver(int localSize, int threadnum, double diagonal) {
-    if(threadnum == 1){
+    if(threadnum == 2){
     // set up comm
     commRcp = getMPIWORLDTCOMM();
     // set up row and col maps, contiguous and evenly distributed
@@ -397,7 +397,7 @@ CPSolver::CPSolver(int localSize, int threadnum, double diagonal) {
     // dump matrix
     dumpTCMAT(Atemp, "Amat");
     dumpTV(bRcp, "bvec");
-    }else if(threadnum > 1)
+    }else
     {
         CPReadA("Amat_TCMAT.mtx");
         CPReadb(localSize, "bvec_TV.mtx");
