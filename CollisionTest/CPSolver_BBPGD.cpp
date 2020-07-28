@@ -288,16 +288,6 @@ void CPSolver::CPReadb(int localSize, std::string filename) {
     //this->bRcp = btemp.getConst();
 }
 
-CPSolver::savedensemat(const Teuchos::RCP<const TCMAT> &A, std::string filename) {
-    filename = filename + std::string("_TCMAT.mtx");
-    if (A->getComm()->getRank() == 0) {
-        std::cout << "dumping " << filename << std::endl;
-    }
-
-    Tpetra::MatrixMarket::Writer<TCMAT> matDumper;
-    matDumper.writeSparseFile(filename, A, filename, filename, true);
-}
-
 // constructor to set random A and b with given size
 CPSolver::CPSolver(int localSize, int threadnum, double diagonal) {
     if(threadnum == 1){
