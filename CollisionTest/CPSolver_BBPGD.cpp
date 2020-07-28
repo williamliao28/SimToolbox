@@ -288,9 +288,19 @@ void CPSolver::CPReadb(int localSize, std::string filename) {
     //this->bRcp = btemp.getConst();
 }
 
+CPSolver::savedensemat(const Teuchos::RCP<const TCMAT> &A, std::string filename) {
+    filename = filename + std::string("_TCMAT.mtx");
+    if (A->getComm()->getRank() == 0) {
+        std::cout << "dumping " << filename << std::endl;
+    }
+
+    Tpetra::MatrixMarket::Writer<TCMAT> matDumper;
+    matDumper.writeSparseFile(filename, A, filename, filename, true);
+}
+
 // constructor to set random A and b with given size
 CPSolver::CPSolver(int localSize, int threadnum, double diagonal) {
-    if(threadnum == 2){
+    if(threadnum == 1){
     // set up comm
     commRcp = getMPIWORLDTCOMM();
     // set up row and col maps, contiguous and evenly distributed
@@ -324,6 +334,12 @@ CPSolver::CPSolver(int localSize, int threadnum, double diagonal) {
             BLocal(i, j) = dis(gen);
         }
     }
+
+    // save B
+
+    Teuchos::RCP<TCMAT> temp_mtx = Teuchos::rcp(&BLocal,false);
+    dumpTCMAT(temp_mtx, "Bmat");
+
     // a random diagonal matrix
     Teuchos::SerialDenseMatrix<int, double> ALocal(localSize, localSize, true);
     Teuchos::SerialDenseMatrix<int, double> tempLocal(localSize, localSize, true);
@@ -331,6 +347,11 @@ CPSolver::CPSolver(int localSize, int threadnum, double diagonal) {
     for (int i = 0; i < localSize; i++) {
         DLocal(i, i) = fabs(dis(gen)) + 2;
     }
+
+    // save D
+
+    temp_mtx = Teuchos::rcp(&DLocal,false);
+    dumpTCMAT(temp_mtx, "Dmat");
 
     // compute B^T D B
     tempLocal.multiply(Teuchos::NO_TRANS, Teuchos::NO_TRANS, 1.0, DLocal, BLocal, 0.0); // temp = DB
