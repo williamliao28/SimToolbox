@@ -325,11 +325,6 @@ CPSolver::CPSolver(int localSize, int threadnum, double diagonal) {
         }
     }
 
-    // save B
-
-    Teuchos::RCP<TCMAT> temp_mtx = BLocal.values();
-    dumpTCMAT(temp_mtx, "Bmat");
-
     // a random diagonal matrix
     Teuchos::SerialDenseMatrix<int, double> ALocal(localSize, localSize, true);
     Teuchos::SerialDenseMatrix<int, double> tempLocal(localSize, localSize, true);
@@ -337,11 +332,6 @@ CPSolver::CPSolver(int localSize, int threadnum, double diagonal) {
     for (int i = 0; i < localSize; i++) {
         DLocal(i, i) = fabs(dis(gen)) + 2;
     }
-
-    // save D
-
-    temp_mtx = DLocal.values();
-    dumpTCMAT(temp_mtx, "Dmat");
 
     // compute B^T D B
     tempLocal.multiply(Teuchos::NO_TRANS, Teuchos::NO_TRANS, 1.0, DLocal, BLocal, 0.0); // temp = DB
@@ -404,6 +394,18 @@ CPSolver::CPSolver(int localSize, int threadnum, double diagonal) {
     this->ARcp = Teuchos::rcp_dynamic_cast<const TOP>(Atemp, true);
     // ARcp = Atemp;
     std::cout << "ARcp" << ARcp->description() << std::endl;
+
+    // Write B and D
+    std::fstream myfile;
+    myfile.open("Bmat",std::fstream::out);
+    myfile << printMat(BLocal);
+    myfile << std::endl;
+    myfile.close();
+
+    myfile.open("Dmat",std::fstream::out);
+    myfile << printMat(DLocal);
+    myfile << std::endl;
+    myfile.close();
 
     // dump matrix
     dumpTCMAT(Atemp, "Amat");
