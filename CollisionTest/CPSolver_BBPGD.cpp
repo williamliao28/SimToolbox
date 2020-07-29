@@ -327,7 +327,7 @@ CPSolver::CPSolver(int localSize, int threadnum, double diagonal) {
 
     // save B
 
-    Teuchos::RCP<TCMAT> temp_mtx = Teuchos::rcp(&BLocal,false);
+    Teuchos::RCP<TCMAT> temp_mtx = BLocal.values();
     dumpTCMAT(temp_mtx, "Bmat");
 
     // a random diagonal matrix
@@ -340,7 +340,7 @@ CPSolver::CPSolver(int localSize, int threadnum, double diagonal) {
 
     // save D
 
-    temp_mtx = Teuchos::rcp(&DLocal,false);
+    temp_mtx = DLocal.values();
     dumpTCMAT(temp_mtx, "Dmat");
 
     // compute B^T D B

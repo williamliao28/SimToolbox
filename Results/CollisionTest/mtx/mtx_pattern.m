@@ -1,6 +1,6 @@
 clear;
 clc;
-mtx_size = 500;
+mtx_size = 2500;
 mtx_name = ['Amat_TCMAT' num2str(mtx_size) '.mtx'];
 
 a = mmread(mtx_name);
