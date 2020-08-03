@@ -11,7 +11,11 @@ void testSedimentation(int argc, char **argv) {
     for (int i = 0; i < 10; i++) {
         sylinderSystem.prepareStep();
         sylinderSystem.runStep();
-        exit(1);
+        if (i > 0)
+        {
+            break;
+        }
+        
     }
 
     // add linked sylinders
