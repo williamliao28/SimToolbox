@@ -12,7 +12,7 @@ void testSedimentation(int argc, char **argv) {
         std::cout << "step: " << i << std::endl;
         sylinderSystem.prepareStep();
         sylinderSystem.runStep();
-        exit(0);
+        abort();
     }
 
     // add linked sylinders
