@@ -27,7 +27,7 @@ void ConstraintSolver::setup(ConstraintCollector &conCollector_, Teuchos::RCP<TO
 
     // save mobOpRcp and DMatTransRcp to .mtx files
     MOpRcp->dumpTCMAT(DMatTransRcp,"DMatTrans");
-    Teuchos::RCP<TCMAT> MobMatRcp = mobOpRcp;
+    Teuchos::RCP<const TCMAT> MobMatRcp = Teuchos::rcp_dynamic_cast<const TCMAT>(mobOpRcp,false);
     MOpRcp->dumpTCMAT(MobMatRcp,"MobMat");
 
     // result
