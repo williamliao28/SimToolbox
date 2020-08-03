@@ -37,6 +37,22 @@ class ConstraintOperator : public TOP {
     ConstraintOperator(Teuchos::RCP<TOP> &mobOp_, Teuchos::RCP<TCMAT> &DMatTransRcp_, Teuchos::RCP<TV> &invKappa_);
 
     /**
+     * @brief Save matrices to files
+     *
+     * @param A
+     * @param filename
+     */
+    void dumpTCMAT(const Teuchos::RCP<const TCMAT> &A, std::string filename);
+
+    /**
+     * @brief Save vectors to files
+     *
+     * @param A
+     * @param filename
+     */
+    void dumpTV(const Teuchos::RCP<const TV> &A, std::string filename);
+
+    /**
      * @brief apply this operator, ensuring the block structure
      *
      * @param X

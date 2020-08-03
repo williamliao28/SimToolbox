@@ -25,6 +25,11 @@ void ConstraintSolver::setup(ConstraintCollector &conCollector_, Teuchos::RCP<TO
     qRcp = Teuchos::rcp(new TV(delta0Rcp->getMap(), true));
     qRcp->update(1.0, *delta0Rcp, 1.0, *deltancRcp, 0.0);
 
+    // save mobOpRcp and DMatTransRcp to .mtx files
+    MOpRcp->dumpTCMAT(DMatTransRcp,"DMatTrans");
+    Teuchos::RCP<TCMAT> MobMatRcp = mobOpRcp;
+    MOpRcp->dumpTCMAT(MobMatRcp,"MobMat");
+
     // result
     forcebRcp = Teuchos::rcp(new TV(mobMapRcp, true));
     forceuRcp = Teuchos::rcp(new TV(mobMapRcp, true));

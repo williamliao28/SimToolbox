@@ -1,5 +1,32 @@
 #include "ConstraintOperator.hpp"
 
+void ConstraintOperator::dumpTCMAT(const Teuchos::RCP<const TCMAT> &A, std::string filename) {
+    filename = filename + std::string("_TCMAT.mtx");
+    if (A->getComm()->getRank() == 0) {
+        std::cout << "dumping " << filename << std::endl;
+    }
+
+    Tpetra::MatrixMarket::Writer<TCMAT> matDumper;
+    matDumper.writeSparseFile(filename, A, filename, filename, true);
+}
+
+void ConstraintOperator::dumpTV(const Teuchos::RCP<const TV> &A, std::string filename) {
+    filename = filename + std::string("_TV.mtx");
+    if (A->getMap()->getComm()->getRank() == 0) {
+        std::cout << "dumping " << filename << std::endl;
+    }
+
+    const auto &fromMap = A->getMap();
+    const auto &toMap =
+        Teuchos::rcp(new TMAP(fromMap->getGlobalNumElements(), 0, fromMap->getComm(), Tpetra::GloballyDistributed));
+    Tpetra::Import<TV::local_ordinal_type, TV::global_ordinal_type, TV::node_type> importer(fromMap, toMap);
+    Teuchos::RCP<TV> B = Teuchos::rcp(new TV(toMap, true));
+    B->doImport(*A, importer, Tpetra::CombineMode::REPLACE);
+
+    Tpetra::MatrixMarket::Writer<TV> matDumper;
+    matDumper.writeDenseFile(filename, B, filename, filename);
+}
+
 ConstraintOperator::ConstraintOperator(Teuchos::RCP<TOP> &mobOp_, Teuchos::RCP<TCMAT> &DMatTransRcp_,
                                        Teuchos::RCP<TV> &invKappa_)
     : commRcp(mobOp_->getDomainMap()->getComm()), mobOpRcp(mobOp_), DMatTransRcp(DMatTransRcp_), invKappa(invKappa_) {
