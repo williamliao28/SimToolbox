@@ -8,15 +8,11 @@ void testSedimentation(int argc, char **argv) {
     auto &rngPoolPtr = sylinderSystem.getRngPoolPtr();
 
     // run 10 steps for relaxation
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 1; i++) {
         std::cout << "step: " << i << std::endl;
         sylinderSystem.prepareStep();
         sylinderSystem.runStep();
-        if (i > 0)
-        {
-            break;
-        }
-        
+        exit(0);
     }
 
     // add linked sylinders
