@@ -1,5 +1,9 @@
 #include "ConstraintSolver.hpp"
 
+void ConstraintSolver::setwritemtxflag(int flag){
+    writemtxflag = flag;
+}
+
 void ConstraintSolver::setup(ConstraintCollector &conCollector_, Teuchos::RCP<TOP> &mobOpRcp_,
                              Teuchos::RCP<TV> &velncRcp_, double dt_) {
     reset();
@@ -26,12 +30,15 @@ void ConstraintSolver::setup(ConstraintCollector &conCollector_, Teuchos::RCP<TO
     qRcp->update(1.0, *delta0Rcp, 1.0, *deltancRcp, 0.0);
 
     // save mobOpRcp and DMatTransRcp to .mtx files
-    std::cout << "Dumping DMatTransRcp..." << std::endl;
-    MOpRcp->dumpTCMAT(DMatTransRcp,"DMatTrans");
-    std::cout << "Convert TOP to TCMAT..." << std::endl;
-    Teuchos::RCP<const TCMAT> MobMatRcp = Teuchos::rcp_dynamic_cast<const TCMAT>(mobOpRcp,false);
-    std::cout << "Dumping mobOpRcp..." << std::endl;
-    MOpRcp->dumpTCMAT(MobMatRcp,"MobMat");
+    if (writemtxflag == 0)
+    {
+        std::cout << "Dumping DMatTransRcp..." << std::endl;
+        MOpRcp->dumpTCMAT(DMatTransRcp,"DMatTrans");
+        std::cout << "Convert TOP to TCMAT..." << std::endl;
+        Teuchos::RCP<const TCMAT> MobMatRcp = Teuchos::rcp_dynamic_cast<const TCMAT>(mobOpRcp,false);
+        std::cout << "Dumping mobOpRcp..." << std::endl;
+        MOpRcp->dumpTCMAT(MobMatRcp,"MobMat");
+    }
 
     // result
     forcebRcp = Teuchos::rcp(new TV(mobMapRcp, true));

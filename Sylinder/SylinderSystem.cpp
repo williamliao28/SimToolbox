@@ -13,6 +13,10 @@
 #include <mpi.h>
 #include <omp.h>
 
+void SylinderSystem::setwritemtxflag(int flag){
+    writemtxflag = flag;
+}
+
 SylinderSystem::SylinderSystem(const std::string &configFile, const std::string &posFile, int argc, char **argv) {
     initialize(SylinderConfig(configFile), posFile, argc, argv);
 }
@@ -650,7 +654,9 @@ void SylinderSystem::resolveConstraints() {
         Teuchos::TimeMonitor mon(*solveTimer);
         const double buffer = 0;
         // printRank0("constraint solver setup");
+        conSolverPtr->setwritemtxflag(writemtxflag); // enable dumping function
         conSolverPtr->setup(*conCollectorPtr, mobilityOperatorRcp, velocityNonConRcp, runConfig.dt);
+        conSolverPtr->setwritemtxflag(1); // disable dumping function
         // printRank0("set control");
         conSolverPtr->setControlParams(runConfig.conResTol, runConfig.conMaxIte, runConfig.conSolverChoice);
         // printRank0("solve");

@@ -82,6 +82,14 @@ class ConstraintSolver {
      */
     void writebackGamma();
 
+    /**
+     * @brief set flag controlling the dumping functions
+     * 
+     * @param flag
+     *
+     */
+    void setwritemtxflag(int flag);
+
     Teuchos::RCP<const TV> getForceUni() const { return forceuRcp; }
     Teuchos::RCP<const TV> getVelocityUni() const { return veluRcp; }
     Teuchos::RCP<const TV> getForceBi() const { return forcebRcp; }
@@ -116,6 +124,9 @@ class ConstraintSolver {
     Teuchos::RCP<ConstraintOperator> MOpRcp; ///< the operator of BCQP problem. M = [B,C;E,F]
     Teuchos::RCP<TV> gammaRcp;               ///< the unknown constraint force magnitude gamma = [gamma_u;gamma_b]
     Teuchos::RCP<TV> qRcp;                   ///< the constant part of BCQP problem. q = delta_0 + delta_nc
+
+    // dumping control flag
+    int writemtxflag = 1;
 
 };
 

@@ -27,6 +27,9 @@
  *
  */
 class SylinderSystem {
+    int writemtxflag = 1; // flag controling the dumping function; default is disabled.
+    void setwritemtxflag(int flag);
+
     bool enableTimer = false;
     int snapID;    ///< the current id of the snapshot file to be saved. sequentially numbered from 0
     int stepCount; ///< timestep Count. sequentially numbered from 0
