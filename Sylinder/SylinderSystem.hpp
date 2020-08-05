@@ -28,7 +28,6 @@
  */
 class SylinderSystem {
     int writemtxflag = 1; // flag controling the dumping function; default is disabled.
-    void setwritemtxflag(int flag);
 
     bool enableTimer = false;
     int snapID;    ///< the current id of the snapshot file to be saved. sequentially numbered from 0
@@ -203,6 +202,14 @@ class SylinderSystem {
      * @param argv command line argument
      */
     void initialize(const SylinderConfig &config, const std::string &posFile, int argc, char **argv);
+
+    /**
+     * @brief set flag controlling the dumping functions
+     *
+     * @param flag
+     * 
+     */
+    void setwritemtxflag(int flag);
 
     /**
      * @brief enable the timer in step()
