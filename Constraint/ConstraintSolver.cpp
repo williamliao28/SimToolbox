@@ -83,7 +83,8 @@ void ConstraintSolver::solveConstraints() {
     // printf("bound constructed\n");
     if (writemtxflag == 0)
     {
-        dumpTV();
+        std::cout << "Dumping lbRcp..." << std::endl;
+        MOpRcp->dumpTV(lbRcp,"lb");
     }
 
     // solve

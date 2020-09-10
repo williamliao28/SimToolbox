@@ -660,7 +660,9 @@ void SylinderSystem::resolveConstraints() {
         // printRank0("set control");
         conSolverPtr->setControlParams(runConfig.conResTol, runConfig.conMaxIte, runConfig.conSolverChoice);
         // printRank0("solve");
+        conSolverPtr->setwritemtxflag(writemtxflag); // enable dumping function
         conSolverPtr->solveConstraints();
+        conSolverPtr->setwritemtxflag(1); // disable dumping function
         // printRank0("writeback");
         conSolverPtr->writebackGamma();
     }
