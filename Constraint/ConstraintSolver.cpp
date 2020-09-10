@@ -81,6 +81,10 @@ void ConstraintSolver::solveConstraints() {
     Teuchos::RCP<TV> lbRcp = solver.getLowerBound();
     lbRcp->scale(-1e8, *biFlagRcp); // 0 if biFlag=0, -1e8 if biFlag=1
     // printf("bound constructed\n");
+    if (writemtxflag == 0)
+    {
+        dumpTV();
+    }
 
     // solve
     IteHistory history;
