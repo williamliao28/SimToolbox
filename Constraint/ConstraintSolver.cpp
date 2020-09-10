@@ -79,12 +79,19 @@ void ConstraintSolver::solveConstraints() {
 
     // the bound of BCQP. 0 for gammau, unbound for gammab.
     Teuchos::RCP<TV> lbRcp = solver.getLowerBound();
+    if (writemtxflag == 0)
+    {
+        std::cout << "Dumping lbRcp (before scale)..." << std::endl;
+        MOpRcp->dumpTV(lbRcp,"lb0");
+    }
     lbRcp->scale(-1e8, *biFlagRcp); // 0 if biFlag=0, -1e8 if biFlag=1
     // printf("bound constructed\n");
     if (writemtxflag == 0)
     {
         std::cout << "Dumping lbRcp..." << std::endl;
         MOpRcp->dumpTV(lbRcp,"lb");
+        std::cout << "Dumping biFlagRcp..." << std::endl;
+        MOpRcp->dumpTV(biFlagRcp,"biFlag");
     }
 
     // solve
