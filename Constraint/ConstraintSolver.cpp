@@ -38,6 +38,8 @@ void ConstraintSolver::setup(ConstraintCollector &conCollector_, Teuchos::RCP<TO
         Teuchos::RCP<const TCMAT> MobMatRcp = Teuchos::rcp_dynamic_cast<const TCMAT>(mobOpRcp,false);
         std::cout << "Dumping mobOpRcp..." << std::endl;
         MOpRcp->dumpTCMAT(MobMatRcp,"MobMat");
+        std::cout << "Dumping invKappa..." << std::endl:
+        MOpRcp->dumpTV(invKappaRcp,"invKappa");
     }
 
     // result
