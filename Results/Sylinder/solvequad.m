@@ -58,7 +58,7 @@ H = (a+a')/2;
 cvx_begin
     cvx_solver sedumi
     variable x(n)
-    minimize ( (1/2)*quad_form(x,H) + b'*x)
+    minimize ( (1/2)*quad_form(x,a) + b'*x)
     x >= 0;
 cvx_end
 
