@@ -4,7 +4,7 @@ clc;
 mtx_name = 'DMatTrans_TCMAT.mtx';
 
 Dt = mmread(mtx_name);
-D = Dt.';
+D = Dt';
 %figure(1);
 %spy(D,'r');
 %figure(2);
@@ -31,8 +31,13 @@ lb = mmread(mtx_name);
 mtx_name = 'biFlag_TV.mtx';
 biFlag = mmread(mtx_name);
 
+R = spchol(M);
+A1 = R*D;
+
 n = length(a);
-b = rand(n,1);
+[m1,m2] = size(A1);
+y = rand(m1,1);
+b = A1'*y;
 b1 = 214;
 b2 = 2888;
 
@@ -40,7 +45,7 @@ if all(b>0)
     fprintf("b>0: TRUE\n");
 else
     fprintf("b>0: FALSE\n");
-end
+end 
 
 xb = zeros(n,1);
 xb(1:b1) = -inf;
@@ -53,15 +58,27 @@ else
     fprintf("x>=0: FALSE\n");
 end
 
+% nonnegative least square solvers
+[x1,resnorm,residual,exitflag,output,lambda] = lsqnonneg(A1,y);
+fprintf("||x-x1|| = %f\n",norm(x-x1));
+fprintf("resnorm = %f\n",resnorm);
+if exitflag == 1
+    fprintf("lsqnonneg converged with a solution X\n");
+else
+    fprintf("Iteration count was exceeded. Increasing the tolerance (OPTIONS.TolX) may lead to a solution\n");
+end
+output
+if all(x1>=0)
+    fprintf("x1>=0: TRUE\n");
+else
+    fprintf("x1>=0: FALSE\n");
+end
+
 % cvx toolbox
 H = (a+a')/2;
 cvx_begin
     cvx_solver sedumi
-    variable x(n)
-    minimize ( (1/2)*quad_form(x,H) + b'*x)
-    x >= 0;
+    variable w(n)
+    minimize( norm(y-A1*w))
+    w >= 0;
 cvx_end
-
-% nonnegative least square solvers
-H = (a+a')/2;
-[R,flag] = chol(H);
