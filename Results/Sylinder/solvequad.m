@@ -50,16 +50,26 @@ end
 xb = zeros(n,1);
 xb(1:b1) = -inf;
 xb(b2:end) = -inf;
+x = zeros(n,1);
+res1 = zeros(100,1);
 options = optimoptions('quadprog','Display','iter','Algorithm','interior-point-convex');
-x = quadprog(a,b,[],[],[],[],zeros(n,1),inf(n,1),[],options);
+for k = 1:100
+    res1(k) = norm(A1*x-y);
+    [x,fval,exitflag,output] = quadprog(a,b,[],[],[],[],x,inf(n,1),[],options);
+end
 if all(x>=0)
     fprintf("x>=0: TRUE\n");
 else
     fprintf("x>=0: FALSE\n");
 end
 
-% nonnegative least square solvers
-[x1,resnorm,residual,exitflag,output,lambda] = lsqnonneg(A1,y);
+% nonnegative least square 
+x1 = zeros(n,1);
+res2 = zeros(100,1);
+for k = 1:100
+    res2(k) = norm(A1*x1-y);
+    [x1,resnorm,residual,exitflag1,output1,lambda] = lsqnonneg(A1,y);
+end
 fprintf("||x-x1|| = %f\n",norm(x-x1));
 fprintf("resnorm = %f\n",resnorm);
 if exitflag == 1
