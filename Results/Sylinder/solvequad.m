@@ -85,6 +85,7 @@ else
 end
 
 % cvx toolbox
+%{
 H = (a+a')/2;
 cvx_begin
     cvx_solver sedumi
@@ -92,3 +93,4 @@ cvx_begin
     minimize( norm(y-A1*w))
     w >= 0;
 cvx_end
+%}
