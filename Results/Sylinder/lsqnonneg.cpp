@@ -18,5 +18,5 @@ void lsqnonneg(double *X, int flops, double *C, int C_nrow, int C_ncol, double *
         tol = 1e-6;
     }
     //Initial res
-
+    
 }
