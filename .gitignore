@@ -24,3 +24,5 @@ latex/
 doc/
 build/
 .ipynb_*/
+
+Results/Sylinder/qpOASES/
