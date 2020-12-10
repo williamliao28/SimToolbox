@@ -1,6 +1,7 @@
 clear;
 clc;
 
+% load matrices
 mtx_name = 'DMatTrans_TCMAT.mtx';
 
 Dt = mmread(mtx_name);
@@ -22,14 +23,19 @@ mtx_name = 'biFlag_TV.mtx';
 biFlag = mmread(mtx_name);
 %}
 
+n = length(a);
+b = -1+2*rand(n,1);
+
 % block-wise Cholesky
+%{
 R = spchol(M);
 A1 = R*D;
 
-n = length(a);
+
 [m1,m2] = size(A1);
 y = rand(m1,1);
 b = A1'*y;
+%}
 
 %{
 b1 = 214;
@@ -58,27 +64,8 @@ else
 end
 disp(output)
 
-% nonnegative least square 
-[x1,resnorm,residual,exitflag1,output1,lambda] = lsqnonneg(A1,y);
-%fprintf("||x-x1|| = %f\n",norm(x-x1));
-fprintf("resnorm = %f\n",resnorm);
-if exitflag1 == 1
-    fprintf("lsqnonneg converged with a solution X\n");
-else
-    fprintf("Iteration count was exceeded. Increasing the tolerance (OPTIONS.TolX) may lead to a solution\n");
-end
-disp(output1)
-
 % test coordinate descent
-x = nnqp(a,b);
-
-
-if all(x1>=0)
-    fprintf("x1>=0: TRUE\n");
-else
-    fprintf("x1>=0: FALSE\n");
-end
-
+%x = nnqp(a,b);
 
 % cvx toolbox
 %{
